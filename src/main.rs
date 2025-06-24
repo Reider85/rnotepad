@@ -165,14 +165,19 @@ impl eframe::App for NotepadApp {
         egui::CentralPanel::default().show(ctx, |ui| {
             if !self.tabs.is_empty() {
                 let tab = &mut self.tabs[self.current_tab];
-                let response = ui.add(
-                    egui::TextEdit::multiline(&mut tab.content)
-                        .desired_rows(20)
-                        .desired_width(f32::INFINITY),
-                );
-                if response.changed() {
-                    tab.modified = true;
-                }
+                // Use scroll area to ensure the text edit can grow vertically
+                egui::ScrollArea::both()
+                    .show(ui, |ui| {
+                        let response = ui.add(
+                            egui::TextEdit::multiline(&mut tab.content)
+                                .desired_rows(1) // Let it grow dynamically
+                                .desired_width(f32::INFINITY) // Full width
+                                .min_size(ui.available_size()), // Fill available space
+                        );
+                        if response.changed() {
+                            tab.modified = true;
+                        }
+                    });
             }
         });
     }
